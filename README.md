@@ -1,6 +1,6 @@
 # Argo CD runtime rebuild
 
-This derived image retains the pinned official Argo CD v3.5.6 application binary and rebuilds Git LFS 3.8.1, Kustomize 5.8.3, Helm 4.3.1 and KSOPS 4.5.1 using Go 1.27.3. The KSOPS source is pinned by full commit. Go module checksums verify downloaded module source. OS packages are updated during build; published images must be consumed by immutable digest.
+This derived image uses pinned Argo CD v3.5.6 source and rebuilds Git LFS 3.8.1, Kustomize 5.8.3, Helm 4.3.1 and KSOPS 4.5.1 using Go 1.27.3. The KSOPS source is pinned by full commit. Go module checksums verify downloaded module source. OS packages are updated during build; published images must be consumed by immutable digest.
 
 The upstream application binary already uses Go 1.26.10. Updating and rebuilding downloaded helpers addresses embedded toolchain and helper security findings. Rendering compatibility must be tested before deployment. Git LFS 3.8.1 includes fixes for CVE-2026-69260, CVE-2026-69261, CVE-2026-105802 and CVE-2026-105803. The image includes KSOPS directly; deployments must remove any old init-container mount that would overwrite it.
 
@@ -13,4 +13,4 @@ Sources: [Argo CD](https://github.com/argoproj/argo-cd/tree/v3.5.6), [Git LFS](h
 
 The next candidate also rebuilds Canonical Pebble v1.33.2, replacing the inherited binary. Argo uses tini as its entrypoint; retaining a patched Pebble avoids relying on absence of current use as remediation. Git LFS, KSOPS and Pebble use checked-in module locks with x/net0.60.0 (and its required x/crypto0.57.0 / x/text0.42.0 where applicable); KSOPS uses gRPC1.83.2. Module source is verified through Go checksum verification. Build scripts test native binaries before cross-compilation, with isolated GPG fixture keys for KSOPS.
 
-The official Argo binary still has two high dependency findings (compress and x/net) identified in the first candidate scan. These are explicitly outstanding; the helper rebuild is not complete application remediation. Fresh image scans and production gates remain mandatory.
+The main Argo binary is rebuilt with compress1.18.7 and x/net0.60.0 to address its two high dependency findings. Its UI is built unchanged from the same pinned source/lockfile. The version identifies downstream dependency changes as v3.5.6+security.1. The OCI size-limit test derives the generated manifest digest rather than hard-coding bytes produced by the old compressor; its exact rejection assertion remains intact. Transport/OCI/archive tests run during the build. This is a downstream build, not an upstream release or a claim that the full upstream contribution pipeline passed. Fresh image scans, authentication, reconciliation and production gates remain mandatory.
