@@ -7,3 +7,10 @@ The upstream application binary already uses Go 1.26.10. Updating and rebuilding
 CI builds amd64 and arm64 images. Candidate scans, representative Helm/Kustomize/KSOPS rendering, Git operations, authentication and live reconciliation are required before deployment. Rebuilding the toolchain does not claim that all dependency findings are resolved. Source versions and their licenses remain those of their upstream projects.
 
 Sources: [Argo CD](https://github.com/argoproj/argo-cd/tree/v3.5.6), [Git LFS](https://github.com/git-lfs/git-lfs/tree/v3.8.1), [Kustomize](https://github.com/kubernetes-sigs/kustomize/tree/kustomize/v5.8.3), [Helm](https://github.com/helm/helm/tree/v4.3.1), [KSOPS](https://github.com/viaduct-ai/kustomize-sops/tree/d9442dc3153d9c16e517a68ce8926c9507386429).
+
+
+## Dependency remediation
+
+The next candidate also rebuilds Canonical Pebble v1.33.2, replacing the inherited binary. Argo uses tini as its entrypoint; retaining a patched Pebble avoids relying on absence of current use as remediation. Git LFS, KSOPS and Pebble use checked-in module locks with x/net0.60.0 (and its required x/crypto0.57.0 / x/text0.42.0 where applicable); KSOPS uses gRPC1.83.2. Module source is verified through Go checksum verification. Build scripts test native binaries before cross-compilation, with isolated GPG fixture keys for KSOPS.
+
+The official Argo binary still has two high dependency findings (compress and x/net) identified in the first candidate scan. These are explicitly outstanding; the helper rebuild is not complete application remediation. Fresh image scans and production gates remain mandatory.
