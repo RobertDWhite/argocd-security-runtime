@@ -26,7 +26,7 @@ ARG TARGETOS TARGETARCH
 RUN --mount=type=cache,target=/go/pkg/mod --mount=type=cache,target=/root/.cache/go-build \
     GOOS=$TARGETOS GOARCH=$TARGETARCH GOFLAGS=-mod=readonly \
     make argocd-all GIT_COMMIT=c2b1e3017e2cec86b122172e861dcd026453ae44 GIT_TAG=v3.5.6 \
-      GIT_TREE_STATE=dirty VERSION=v3.5.6+security.1 EXTRA_BUILD_INFO=downstream-dependency-patches
+      GIT_TREE_STATE=dirty VERSION=3.5.6 EXTRA_BUILD_INFO=downstream-dependency-patches
 
 FROM --platform=$BUILDPLATFORM golang:1.27.3@sha256:f20d83a83e18dbd2a4714b8ffd4b30b287b6243962dd75608e86abcc63ba4efc AS tools
 ARG TARGETOS TARGETARCH
